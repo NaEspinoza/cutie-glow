@@ -12,13 +12,14 @@ import { client } from '@/sanity/sanity'
 
 // 3. Ajustamos el tipo de Producto a los nombres que pusimos en español en Sanity
 type Product = {
-  _id: string // Sanity usa texto único en vez de números para el ID
+  _id: string
   nombre: string
-  categoria: 'Perfumes' | 'Maquillaje' | 'Skincare'
+  categoria: 'perfumeria' | 'maquillaje' | 'skincare' // Asegúrate de que diga 'categoria' y no 'category'
   precio: number
   imagenUrl: string
   descripcion?: string
 }
+
 
 const money = (value: number) =>
   new Intl.NumberFormat('es-AR', {
@@ -43,26 +44,15 @@ export default function Page() {
           *[_type == "producto"] {
             _id,
             nombre,
-            "categoria": categoria, 
+            categoria, // Traemos el valor directo ('perfumeria', 'maquillaje' o 'skincare')
             precio,
             descripcion,
             "imagenUrl": imagen.asset->url
           }
         `)
         
-        // Mapeamos los datos para asegurar las mayúsculas de tus filtros
-        const formattedData = data.map((p: any) => ({
-          _id: p._id,
-          nombre: p.nombre,
-          precio: p.precio,
-          imagenUrl: p.imagenUrl,
-          descripcion: p.descripcion,
-          // Convierte "perfumeria" en "Perfumes" para que coincida con tus botones
-          category: p.categoria === 'perfumeria' ? 'Perfumes' : 
-                    p.categoria === 'maquillaje' ? 'Maquillaje' : 'Skincare'
-        }))
-
-        setProducts(formattedData)
+        // Guardamos los productos puros tal cual vienen de Sanity
+        setProducts(data)
       } catch (error) {
         console.error("Error al traer productos de Sanity:", error)
       }
@@ -71,22 +61,29 @@ export default function Page() {
     fetchSanityProducts()
   }, [])
 
-  // Los filtros ahora leen dinámicamente del estado de 'products'
+  // Los filtros leen en vivo el valor de Sanity y lo comparan con tu botón de la interfaz
   const filtered =
     category === 'Todos'
       ? products
-      : products.filter((p) => p.categoria === category)
+      : products.filter((p) => {
+          if (category === 'Perfumes' && p.categoria === 'perfumeria') return true
+          if (category === 'Maquillaje' && p.categoria === 'maquillaje') return true
+          if (category === 'Skincare' && p.categoria === 'skincare') return true
+          return false
+        })
 
-  const total = useMemo(
+  
+      const total = useMemo(
     () => cart.reduce((sum, item) => sum + item.precio, 0),
     [cart]
   )
+
 
   function addProduct(product: Product) {
     setCart((current) => [...current, product])
     setOpenCart(true)
   }
-
+  
   function checkout() {
     // Ajustamos p.name por p.nombre porque así viene de Sanity
     const message = `Hola Cutie Glow, quiero consultar por:%0A${cart

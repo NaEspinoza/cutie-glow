@@ -25,6 +25,20 @@ export const producto = defineType({
       name: 'descripcion',
       title: 'Descripción',
       type: 'text',
-    }
-  ]
+    },
+    
+    {
+      name: 'categoria',
+      title: 'Categoría',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Perfumes', value: 'perfumeria' },
+          { title: 'Maquillaje', value: 'maquillaje' },
+          { title: 'Skincare', value: 'skincare' },
+        ],
+        layout: 'dropdown', // Esto fuerza a que se vea como un menú desplegable
+      },
+    },
+  ],
 })
