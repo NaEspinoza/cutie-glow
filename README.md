@@ -31,7 +31,7 @@ Si deseas clonar y correr este proyecto de forma local en tu computadora, sigue 
 
 ### 1. Clonar el repositorio e instalar dependencias
 ```bash
-git clone https://github.com
+git clone https://github.com/jeremias1234-bit/cutie-glow.git
 cd cutie-glow
 pnpm install
 ```
