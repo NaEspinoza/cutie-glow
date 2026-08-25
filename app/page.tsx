@@ -155,11 +155,7 @@ export default function Page() {
         <div className="hero-product">
           <div className="sunburst"></div>
           <div className="hero-bottle">
-            <div className="bottle-cap"></div>
-            <div className="bottle-label">
-              LUMIÈRE<br />
-              <small>EAU DE PARFUM</small>
-            </div>
+
           </div>
           <p>
             Una fragancia para<br />
