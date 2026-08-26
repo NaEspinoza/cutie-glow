@@ -1,5 +1,4 @@
 import type { StructureResolver } from 'sanity/structure'
-import { ControlsIcon } from '@sanity/icons'
 
 const SINGLETON_TYPES = new Set(['configuracionSitio'])
 
@@ -10,7 +9,6 @@ export const structure: StructureResolver = (S) =>
     .items([
       S.listItem()
         .title('Configuración del sitio')
-        .icon(ControlsIcon)
         .child(
           S.document()
             .schemaType('configuracionSitio')
