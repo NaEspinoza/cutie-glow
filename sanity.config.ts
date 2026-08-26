@@ -2,7 +2,6 @@ import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { schema } from './sanity/schemaTypes'
 import { structure } from './sanity/structure'
-import { projectId, dataset } from './sanity/env'
 
 const SINGLETON_TYPES = new Set(['configuracionSitio'])
 
@@ -10,8 +9,12 @@ export default defineConfig({
   name: 'default',
   title: 'Cutie Glow',
 
-  projectId,
-  dataset,
+  // El Studio se bundlea con el compilador propio de Sanity (Vite), que solo
+  // inyecta env vars con prefijo SANITY_STUDIO_ — no NEXT_PUBLIC_ (eso es
+  // exclusivo del bundler de Next.js). projectId/dataset no son secretos
+  // (son identificadores públicos), así que van hardcodeados acá.
+  projectId: 's2trabv5',
+  dataset: 'production',
 
   plugins: [structureTool({ structure })],
 
