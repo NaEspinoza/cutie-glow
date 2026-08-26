@@ -34,7 +34,7 @@ export default function Page() {
   const [openCart, setOpenCart] = useState(false)
   
   // 4. Creamos un estado para guardar los productos de Sanity (empieza vacío)
-  const [products, setProducts] = useState<Product[]>([])
+  const [products, setProducts] = useState<Product[]>([]) 
 
   // 5. Este bloque consulta a Sanity ni bien el usuario entra a la web
   useEffect(() => {
