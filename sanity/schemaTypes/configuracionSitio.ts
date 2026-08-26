@@ -1,11 +1,11 @@
 import { defineField, defineType } from 'sanity'
-import { CogIcon } from '@sanity/icons'
+import { ControlsIcon } from '@sanity/icons'
 
 export const configuracionSitio = defineType({
   name: 'configuracionSitio',
   title: 'Configuración del sitio',
   type: 'document',
-  icon: CogIcon,
+  icon: ControlsIcon,
   // Documento único (singleton): no debe aparecer en el menú "Crear nuevo".
   // El singleton se fuerza en sanity/structure.ts + sanity.config.ts (document.actions).
   fields: [

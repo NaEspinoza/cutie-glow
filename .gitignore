@@ -14,3 +14,7 @@ node_modules
 .next/
 out/
 .DS_Store
+
+# Artefactos de build del Sanity Studio (npx sanity deploy)
+dist/
+.sanity/
