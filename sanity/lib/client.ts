@@ -6,5 +6,7 @@ export const client = createClient({
   projectId,
   dataset,
   apiVersion,
-  useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+  // false: siempre trae el dato recién publicado en cada build (los builds
+  // son infrecuentes, disparados por el webhook de Sanity al publicar).
+  useCdn: false,
 })

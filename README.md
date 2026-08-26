@@ -8,26 +8,26 @@
 
 El proyecto fue construido con un Stack tecnológico de nivel profesional:
 
-*   **Frontend:** [Next.js](https://nextjs.org) (App Router) + TypeScript.
-*   **Gestor de Contenidos (CMS Headless):** [Sanity v3](https://sanity.io) (Estudio incrustado bajo la ruta `/studio`).
-*   **Gestor de Paquetes:** [pnpm](https://pnpm.io) (Configurado para instalaciones ultra rápidas mediante espacios de trabajo).
+*   **Frontend:** [Next.js](https://nextjs.org) (App Router) + TypeScript, exportado como sitio 100% estático (`output: 'export'`).
+*   **Gestor de Contenidos (CMS Headless):** [Sanity v3](https://sanity.io) — Studio desplegado por separado (no vive dentro de la app Next.js).
+*   **Hosting:** [Cloudflare Pages](https://pages.cloudflare.com) (CDN global, sin servidor propio).
+*   **Gestor de Paquetes:** [pnpm](https://pnpm.io).
 *   **Estilos y Componentes:** Tailwind CSS + Radix UI / Shadcn UI.
-*   **Integración de Ventas:** Checkout e integraciones directas automatizadas con la API de WhatsApp.
+*   **Integración de Ventas:** Checkout e integraciones directas automatizadas con la API de WhatsApp (`wa.me`).
 
 ---
 
 ## 🛠️ Características Principales
 
-*   **Catálogo Dinámico:** Los productos se cargan y editan desde Sanity Studio e impactan en vivo en el sitio web principal sin necesidad de modificar el código.
+*   **Catálogo Dinámico:** Los productos se cargan y editan desde Sanity Studio, y se traen en build-time (Server Component) hacia el sitio estático.
 *   **Filtros en Tiempo Real:** Filtrado interactivo en el cliente por categorías (*Perfumes*, *Maquillaje*, *Skincare*).
 *   **Carrito de Compras Integrado:** Flujo completo para añadir elementos, calcular subtotales y generar un mensaje pre-formateado automáticamente para enviar el pedido por WhatsApp.
-*   **Seguridad Estricta:** Implementación de tipado estricto con TypeScript tanto en el esquema de la base de datos de Sanity como en los componentes del Frontend.
+*   **Configuración editable sin código:** nombre del negocio, texto del hero, WhatsApp, Instagram, email y dirección viven en el documento único `configuracionSitio` de Sanity — el dueño del negocio los edita sin tocar el repo.
+*   **Rebuild automático:** un webhook de Sanity dispara un Deploy Hook de Cloudflare Pages cada vez que se publica un `producto` o `configuracionSitio`, reconstruyendo el sitio en 1-2 minutos.
 
 ---
 
 ## 💻 Configuración Local
-
-Si deseas clonar y correr este proyecto de forma local en tu computadora, sigue estos pasos:
 
 ### 1. Clonar el repositorio e instalar dependencias
 ```bash
@@ -39,23 +39,45 @@ pnpm install
 ### 2. Variables de entorno (`.env.local`)
 Crea un archivo llamado `.env.local` en la raíz del proyecto y añade tus credenciales de Sanity:
 ```text
-NEXT_PUBLIC_SANITY_PROJECT_ID="tu_project_id_de_8_caracteres"
+NEXT_PUBLIC_SANITY_PROJECT_ID="s2trabv5"
 NEXT_PUBLIC_SANITY_DATASET="production"
 ```
 
-### 3. Ejecutar el servidor de desarrollo
+### 3. Ejecutar el sitio web
 ```bash
 pnpm dev
 ```
-*   La página web principal correrá en: `http://localhost:3000`
-*   El panel de administración (Sanity Studio) estará disponible en: `http://localhost:3000/studio`
+La página web principal corre en: `http://localhost:3000`
+
+### 4. Ejecutar el Sanity Studio (local)
+El Studio ya no vive dentro de la app Next.js. Para editarlo/probarlo localmente:
+```bash
+npx sanity dev
+```
+Studio local en: `http://localhost:3333`
+
+### 5. Validar el build estático
+```bash
+pnpm run build     # genera la carpeta out/
+pnpm run preview   # sirve out/ localmente para probarlo antes de deployar
+```
+
+---
+
+## 🌐 Producción
+
+*   **URL:** https://cutieglow.aitria.ai
+*   **Hosting:** Cloudflare Pages, build estático (`output: 'export'`, carpeta `out/`).
+*   **Studio:** desplegado con `npx sanity deploy` a `https://<hostname-elegido>.sanity.studio`.
+*   **Rebuild automático:** webhook de Sanity (`manage.sanity.io` → API → Webhooks) filtrado a `_type == "producto" || _type == "configuracionSitio"`, apuntando al Deploy Hook del proyecto en Cloudflare Pages.
+*   **Pendiente conocido:** el campo `whatsapp` de `configuracionSitio` tiene un número placeholder (`5492610000000`) hasta que se cargue el número real del negocio — se edita directamente en el Studio, sin necesidad de tocar código ni redeployar a mano.
 
 ---
 
 ## 📐 Estructura del Proyecto
 
-El backend de datos y el diseño visual conviven de forma modular:
-*   `app/` — Rutas y vistas principales de Next.js (App Router).
-*   `app/studio/` — Punto de entrada para el renderizado del panel de Sanity en el cliente.
-*   `sanity/` — Configuración del cliente y lógica de esquemas.
-*   `sanity/schemaTypes/` — Estructura y modelos de datos (Esquema de `producto.ts` personalizado).
+*   `app/` — Rutas y vistas principales de Next.js (App Router). `page.tsx` es un Server Component que trae productos y configuración de Sanity en build-time.
+*   `components/landing-client.tsx` — Toda la interactividad de la landing (filtros, carrito, checkout por WhatsApp).
+*   `sanity/` — Configuración del cliente (`sanity/lib/client.ts`, env-driven) y lógica de esquemas.
+*   `sanity/schemaTypes/` — `producto.ts` (catálogo) y `configuracionSitio.ts` (singleton de configuración del sitio).
+*   `sanity.config.ts` / `sanity.cli.ts` — Configuración del Studio, desplegado de forma independiente (no dentro de la app Next.js).
