@@ -1,15 +1,25 @@
-import type {StructureResolver} from 'sanity/structure'
+import type { StructureResolver } from 'sanity/structure'
+import { CogIcon } from '@sanity/icons'
+
+const SINGLETON_TYPES = new Set(['configuracionSitio'])
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Blog')
+    .title('Cutie Glow')
     .items([
-      S.documentTypeListItem('post').title('Posts'),
-      S.documentTypeListItem('category').title('Categories'),
-      S.documentTypeListItem('author').title('Authors'),
+      S.listItem()
+        .title('Configuración del sitio')
+        .icon(CogIcon)
+        .child(
+          S.document()
+            .schemaType('configuracionSitio')
+            .documentId('configuracionSitio'),
+        ),
       S.divider(),
+      // Resto de tipos de documento, excluyendo el singleton para que no
+      // aparezca duplicado como lista de "crear varios".
       ...S.documentTypeListItems().filter(
-        (item) => item.getId() && !['post', 'category', 'author'].includes(item.getId()!),
+        (item) => !SINGLETON_TYPES.has(item.getId() as string),
       ),
     ])
